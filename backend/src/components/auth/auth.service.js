@@ -1,6 +1,8 @@
 
 const db = require('../../../config/db')
-const bycyrpt = require('bcryptjs')
+const bycyrpt = require('bcryptjs');
+const bcrypt = require('bcryptjs/dist/bcrypt');
+const jwt = require('jsonwebtoken')
 
 class AuthService {
 
@@ -50,6 +52,50 @@ class AuthService {
             ]);
 
             return result.rows[0];
+    }
+
+    async loginUser (username, password){
+        const normalizedUsername = username.trim().toLowerCase();
+
+        const findUserQuery = `
+        SELECT username, phone_number, password_hash
+        FROM users
+        where username = $1;
+        `;
+
+        const result = await db.query(findUserQuery, [normalizedUsername]);
+
+        if(result.rows.length == 0){
+            throw new Error("Invalid Username or Password Credentials!");
+        }
+
+        const user = result.rows[0];
+
+        const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+
+        if(!isPasswordValid){
+            throw new Error ("Invalid Username or Password Credentials!");
+        }
+
+        // generate a signed, stateless Web Token
+        // we store the user id inside the payload packet
+        const tokenPayload = {
+            id: user.id,
+            username: user.username
+        };
+
+        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+            expiresIn: '30d'
+        });
+
+        return{
+            user: {
+                id: user.id,
+                username: user.username,
+                phone_number: user.phone_number
+            },
+            token
+        };
     }
 }
 

@@ -33,4 +33,32 @@ class AuthController{
             });
         }
     }
+
+
+    async login(req, res){
+        try{
+            const {username, passowrd} = req.body;
+
+            if(!username || !password){
+                return res.status(400).json({
+                    success: false,
+                    message: 'Username and Password are required'
+                });
+            }
+
+            const authData = await authService.login(username, password);
+
+            return res.status(200).json({
+                success: true,
+                message: 'Authentication Successful!',
+                data: authData
+            });
+
+        }catch(error){
+            res.status(200).json({
+                success: false,
+                message: error.message || 'Authentication Failed!'
+            });
+        }
+    }
 }
