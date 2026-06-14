@@ -26,6 +26,18 @@ class ContactService{
 
         return matchedUsers;
     }
+
+    async searchUsers(currentUserId, searchQuery){
+        const sanitizedQuery = searchQuery
+      .trim()
+      .replace(/%/g, '\\%')
+      .replace(/_/g, '\\_');
+
+        const formattedQuery = `%${sanitizedQuery}%`; 
+
+        const results = await db.query(contactQueries.searchGlobalUsers, [formattedQuery, currentUserId]);
+        return results.rows;
+    }
 }
 
 module.exports = new ContactService();

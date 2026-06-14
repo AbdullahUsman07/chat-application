@@ -31,6 +31,38 @@ class ContactsController{
             });
         }
     }
+
+    /**
+     * Handles GET requests for global users
+     */
+    async search(res,req){
+        try{
+
+            const searchQuery = res.query.q;
+            const userId = res.user.id;
+
+            if (!searchQuery || searchQuery.trim().length < 2){
+                return res.status(400).json({
+                    success: false,
+                    message: 'Search Query must be atleast 2 characters long'
+                });
+            }
+            
+            const matchingUsers = await contactsService.searchUsers(userId, searchQuery);
+
+            return res.status(200).json({
+                success: true,
+                message: matchingUsers.length > 0 ? 'Users Found.' : 'No Users match your match',
+                data: matchingUsers
+            });
+        }catch(error){
+            return res.status(500).json({
+                success: false,
+                message: 'An error occured during the global search',
+                error: error.message
+            });
+        }
+    }
 }
 
 module.exports = new ContactsController();
