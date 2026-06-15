@@ -1,5 +1,6 @@
 
 .env
-test-db.js
+
 
 backend/node_modules/
+backend/tests/
