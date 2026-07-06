@@ -4,3 +4,5 @@
 
 backend/node_modules/
 backend/tests/
+
+frontend/lib/config/enviornment.dart
