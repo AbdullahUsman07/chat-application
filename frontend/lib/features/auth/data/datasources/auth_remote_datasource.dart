@@ -6,14 +6,15 @@ class AuthRemoteDataSource{
 
   AuthRemoteDataSource({required this.dio});
 
-  Future<String> login(String password, String username) async{
+  Future<String> login(String username, String password) async{
     try{
-      final response = await dio.post('/auth/login', data:{
+      final response = await dio.post('/api/auth/login', data:{
         'username': username,
         'password': password
       });
 
-      return response.data['token'];
+      final token = response.data['data']['token'] as String;
+      return token;
     } on DioException catch(e){
       throw Exception(e.response?.data['message'] ?? 'Login Failed');
     }
@@ -22,12 +23,11 @@ class AuthRemoteDataSource{
   Future<String> signup(String username, String phoneNumber, String password) async{
 
     try{
-      final response = await dio.post('/auth/signup', data: {
+      final response = await dio.post('/api/auth/signup', data: {
         'username' : username,
         'phone_number': phoneNumber,
         'password': password
       });
-
       return response.data['token'];
     } on DioException catch (e){
 
