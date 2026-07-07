@@ -58,7 +58,7 @@ class AuthService {
         const normalizedUsername = username.trim().toLowerCase();
 
         const findUserQuery = `
-        SELECT username, phone_number, password_hash
+        SELECT id, username, phone_number, password_hash
         FROM users
         where username = $1;
         `;

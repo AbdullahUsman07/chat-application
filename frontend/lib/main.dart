@@ -32,7 +32,7 @@ class ChatApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           useMaterial3: true,
         ),
-        home: LoginPage(),
+        home: SignupPage(),
       ),
     );
   }

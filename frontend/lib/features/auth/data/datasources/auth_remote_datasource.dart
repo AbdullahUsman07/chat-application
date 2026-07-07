@@ -28,6 +28,9 @@ class AuthRemoteDataSource{
         'phone_number': phoneNumber,
         'password': password
       });
+
+      print("DEBUG: Raw Response Data Type: ${response.data.runtimeType}");
+      print("DEBUG: Raw Response Body: ${response.data}");
       return response.data['token'];
     } on DioException catch (e){
 

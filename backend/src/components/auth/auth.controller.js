@@ -1,5 +1,6 @@
 
 const authService = require('./auth.service')
+const jwt = require('jsonwebtoken')
 
 class AuthController{
 
@@ -16,15 +17,27 @@ class AuthController{
 
             const newUser = await authService.register_user(username, phone_number, password);
 
+            const tokenPayload = {
+                id: newUser.id,
+                username: newUser.username
+            };
+
+            const token = jwt.sign(tokenPayload, process.env.JWT_SECRET,{
+                expiresIn: '30d'
+            });
+
             return res.status(201).json({
                 success: true,
                 message: 'User Account Created Successfully!',
                 data:{
+                    user: {
                     id: newUser.id,
                     username: newUser.username,
                     phone_number: newUser.phone_number,
                     created_at: newUser.created_at
-                }
+                },
+            },
+            token: token
             });
         } catch(error){
             return res.status(409).json({
