@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
+import '../../../chat_dashboard/presentation/pages/dashboard_page.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -25,13 +26,16 @@ class LoginPage extends StatelessWidget {
               ),
             );
           } else if (state is AuthAuthenticated) {
-            // TODO: Naviagte to Chat Dashboard
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Login Successful!'),
                 backgroundColor: Colors.green,
               ),
             );
+
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => DashboardPage()));
           }
         },
         builder: (context, state) {

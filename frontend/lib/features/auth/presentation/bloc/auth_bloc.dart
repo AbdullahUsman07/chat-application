@@ -1,14 +1,19 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/data/datasources/auth_local_datasource.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState>{
 
-  final AuthRemoteDataSource dataSource;
+  final AuthRemoteDataSource remoteDataSource;
+  final AuthLocalDataSource localDataSource;
 
-  AuthBloc({required this.dataSource}): super(AuthInitial()){
+  AuthBloc({
+    required this.remoteDataSource,
+    required this.localDataSource,
+    }): super(AuthInitial()){
     on<LoginRequested>(_onLoginRequested);
     on<SignupRequested>(_onSignupRequested);
   }
@@ -17,8 +22,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
     emit(AuthLoading());
 
     try{
-      final token = await dataSource.login(event.username, event.password);
-      // TODO: Save token to secure storage here
+      final token = await remoteDataSource.login(event.username, event.password);
+      
+      await localDataSource.saveToken(token);
+
       emit(AuthAuthenticated(token));
     }catch(e){
       emit(AuthError(e.toString()));
@@ -29,8 +36,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
     emit(AuthLoading());
 
     try{
-      final token = await dataSource.signup(event.username, event.phoneNumber, event.password);
-      // TODO: Save token to secure storage here
+      final token = await remoteDataSource.signup(event.username, event.phoneNumber, event.password);
+      
+      await localDataSource.saveToken(token);
+      
       emit(AuthAuthenticated(token));
     }catch(e){
       emit(AuthError(e.toString()));
