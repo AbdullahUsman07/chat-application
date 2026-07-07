@@ -14,7 +14,7 @@ class AuthController{
                 });
             }
 
-            const newUser = authService.register_user(username, phone_number, password);
+            const newUser = await authService.register_user(username, phone_number, password);
 
             return res.status(201).json({
                 success: true,
@@ -37,7 +37,7 @@ class AuthController{
 
     async login(req, res){
         try{
-            const {username, passowrd} = req.body;
+            const {username, password} = req.body;
 
             if(!username || !password){
                 return res.status(400).json({
@@ -46,7 +46,7 @@ class AuthController{
                 });
             }
 
-            const authData = await authService.login(username, password);
+            const authData = await authService.loginUser(username, password);
 
             return res.status(200).json({
                 success: true,
@@ -55,7 +55,7 @@ class AuthController{
             });
 
         }catch(error){
-            res.status(200).json({
+            res.status(401).json({
                 success: false,
                 message: error.message || 'Authentication Failed!'
             });
