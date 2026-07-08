@@ -16,6 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
     }): super(AuthInitial()){
     on<LoginRequested>(_onLoginRequested);
     on<SignupRequested>(_onSignupRequested);
+    on<LogoutRequested>(_onLogoutRequested);
   }
 
   Future<void> _onLoginRequested(LoginRequested event, Emitter<AuthState> emit) async{
@@ -43,6 +44,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState>{
       emit(AuthAuthenticated(token));
     }catch(e){
       emit(AuthError(e.toString()));
+    }
+  }
+
+  Future<void> _onLogoutRequested(LogoutRequested event, Emitter<AuthState> emit) async{
+    try{
+
+      await localDataSource.clearToken();
+
+      emit(AuthInitial());
+    }catch(e){
+      emit(AuthError('Failed to Logout! ${e.toString()}'));
     }
   }
 }
