@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/presentation/pages/signup_page.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -15,7 +16,12 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(
+        title: const Text('Login'),
+        centerTitle: true,
+        elevation: 1.0,
+        
+        ),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
@@ -68,6 +74,18 @@ class LoginPage extends StatelessWidget {
                       );
                     },
                     child: const Text('Login'),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Text("Don't have an Account?"),
+                      const SizedBox(width: 5,),
+                      TextButton(onPressed: (){
+                        Navigator.pushReplacement(
+                          context, 
+                          MaterialPageRoute(builder: (context) => SignupPage()));
+                      }, child: Text('Signup')),
+                    ],
                   ),
               ],
             ),

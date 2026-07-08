@@ -1,6 +1,6 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/features/auth/presentation/pages/login_page.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -16,7 +16,10 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Sign up')),
+      appBar: AppBar(
+        title: const Text('Sign up'),
+        centerTitle: true,
+        elevation: 1.0,),
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthError) {
@@ -27,7 +30,6 @@ class SignupPage extends StatelessWidget {
               ),
             );
           } else if (state is AuthAuthenticated) {
-            
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Signup  Successful!'),
@@ -37,7 +39,8 @@ class SignupPage extends StatelessWidget {
 
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => DashboardPage()));
+              MaterialPageRoute(builder: (context) => DashboardPage()),
+            );
           }
         },
         builder: (context, state) {
@@ -55,7 +58,7 @@ class SignupPage extends StatelessWidget {
                   controller: _phonenumberController,
                   decoration: const InputDecoration(labelText: 'Phone Number'),
                 ),
-                const SizedBox(height: 16,),
+                const SizedBox(height: 16),
                 TextField(
                   controller: _passwordController,
                   decoration: const InputDecoration(labelText: 'Password'),
@@ -77,6 +80,22 @@ class SignupPage extends StatelessWidget {
                     },
                     child: const Text('Signup'),
                   ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Text("Already have an Account!"),
+                    const SizedBox(width: 5),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginPage()),
+                        );
+                      },
+                      child: Text('Login'),
+                    ),
+                  ],
+                ),
               ],
             ),
           );
