@@ -5,6 +5,10 @@ import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../auth/presentation/pages/signup_page.dart';
 
+import '../../../../injection.dart';
+import '../../../contact_discovery/presentation/bloc/contact_permission_bloc.dart';
+import '../../../contact_discovery/presentation/widgets/contact_permission_prompt.dart';
+
 class DashboardPage extends StatelessWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
@@ -34,24 +38,51 @@ class DashboardPage extends StatelessWidget {
             ),
           ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.chat_bubble_outline, size: 80, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text(
-                'Welcome to Your Real-Time Chat App!',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Sprint 2.1 Complete.',
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ],
+        // body: Center(
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       const Icon(Icons.chat_bubble_outline, size: 80, color: Colors.blue),
+        //       const SizedBox(height: 16),
+        //       const Text(
+        //         'Welcome to Your Real-Time Chat App!',
+        //         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        //       ),
+        //       const SizedBox(height: 8),
+        //       Text(
+        //         'Sprint 2.1 Complete.',
+        //         style: TextStyle(color: Colors.grey[600]),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        body: BlocProvider(
+          create: (context) => sl<ContactPermissionBloc>(),
+          child: ContactPermissionPrompt(
+            childOnGranted: _buildDashboardContent(),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardContent() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.chat_bubble_outline, size: 80, color: Colors.blue),
+          const SizedBox(height: 16),
+          const Text(
+            'Welcome to Your Real-Time Chat App!',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Sprint 2.1 & 2.2 Permission Integration Active.',
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+        ],
       ),
     );
   }

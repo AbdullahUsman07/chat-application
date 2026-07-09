@@ -1,4 +1,5 @@
 
+import 'package:frontend/features/contact_discovery/presentation/bloc/contact_permission_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'core/network/api_client.dart';
@@ -27,4 +28,6 @@ void init(){
       remoteDataSource: sl<AuthRemoteDataSource>(),
       localDataSource: sl<AuthLocalDataSource>()),
   );
+
+  sl.registerFactory(() => ContactPermissionBloc());
 }
