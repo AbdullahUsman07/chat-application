@@ -66,5 +66,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSContactsUsageDescription</key>
+    <string>This application requires secure access to your contacts to automatically detect active chat profiles inside our system.</string>
 </dict>
 </plist>
