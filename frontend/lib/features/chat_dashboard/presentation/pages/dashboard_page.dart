@@ -8,113 +8,175 @@ import '../../../auth/presentation/pages/signup_page.dart';
 import '../../../../injection.dart'; 
 import '../../../contact_discovery/presentation/bloc/contact_permission_bloc.dart';
 import '../../../contact_discovery/presentation/widgets/contact_permission_prompt.dart';
-// NEW IMPORTS FOR RETRIEVAL ENGINE TESTING
-import '../../../contact_discovery/data/datasources/contact_local_data_source.dart';
+import '../../../contact_discovery/presentation/bloc/discovery_bloc.dart';
+import '../../../contact_discovery/presentation/bloc/discovery_event.dart';
+import '../../../contact_discovery/presentation/bloc/discovery_state.dart';
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state is AuthInitial) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => SignupPage()),
-            (route) => false,
-          );
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Chat Dashboard'),
-          automaticallyImplyLeading: false,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.redAccent),
-              tooltip: 'Logout Session',
-              onPressed: () {
-                context.read<AuthBloc>().add(LogoutRequested());
-              },
-            ),
-          ],
-        ),
-        body: BlocProvider(
-          create: (context) => sl<ContactPermissionBloc>(),
-          child: ContactPermissionPrompt(
-            childOnGranted: _buildDashboardContent(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => sl<ContactPermissionBloc>()),
+        BlocProvider(create: (context) => sl<DiscoveryBloc>()..add(SyncContactEvent())),
+      ],
+      child: BlocListener<AuthBloc, AuthState>(
+        listener: (context, state) {
+          if (state is AuthInitial) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => SignupPage()),
+              (route) => false,
+            );
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Chat Dashboard'),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.redAccent),
+                tooltip: 'Logout Session',
+                onPressed: () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                },
+              ),
+            ],
+          ),
+          body: ContactPermissionPrompt(
+            childOnGranted: const _MyContactsView(),
           ),
         ),
       ),
     );
   }
+}
 
-  // Uses a FutureBuilder to asynchronously fetch and output the sanitized device list
-  Widget _buildDashboardContent() {
-    return FutureBuilder<List<String>>(
-      future: sl<ContactLocalDataSource>().getSanitizedPhoneNumbers(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Extracting & Sanitizing Device Contacts...', style: TextStyle(fontWeight: FontWeight.w500)),
-              ],
-            ),
-          );
-        }
+class _MyContactsView extends StatelessWidget {
+  const _MyContactsView({Key? key}) : super(key: key);
 
-        if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              'Extraction Error: ${snapshot.error}',
-              style: const TextStyle(color: Colors.redAccent),
-            ),
-          );
-        }
-
-        final sanitizedNumbers = snapshot.data ?? [];
-
-        // PRINT VERIFICATION DIRECTLY TO YOUR RUNNING CONSOLE TERMINAL
-        debugPrint('=====================================================');
-        debugPrint('🚀 SUCCESS: EXTRACTED ${sanitizedNumbers.length} UNIQUE CONTACTS');
-        for (var i = 0; i < sanitizedNumbers.length; i++) {
-          debugPrint('   [$i] -> Raw conversion output: ${sanitizedNumbers[i]}');
-        }
-        debugPrint('=====================================================');
-
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.verified_user_rounded, size: 80, color: Colors.green),
-              const SizedBox(height: 16),
-              const Text(
-                'Sync & Normalization Engine Verified!',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    return RefreshIndicator(
+      onRefresh: () async {
+        context.read<DiscoveryBloc>().add(SyncContactEvent());
+      },
+      child: BlocBuilder<DiscoveryBloc, DiscoveryState>(
+        builder: (context, state) {
+          if (state is DiscoveryLoading) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Checking backend for matching profiles...', style: TextStyle(color: Colors.grey)),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Found ${sanitizedNumbers.length} de-duplicated numbers on this device.',
-                style: TextStyle(color: Colors.grey[700], fontSize: 15),
-              ),
-              const SizedBox(height: 16),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.0),
-                child: Text(
-                  'Check your IDE terminal to see the clean mapped international strings output!',
-                  style: TextStyle(color: Colors.grey, fontSize: 13),
-                  textAlign: TextAlign.center,
+            );
+          }
+
+          if (state is DiscoveryFailure) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
+                    const SizedBox(height: 16),
+                    const Text('Sync Error Occurred', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text(state.errorMessage, style: const TextStyle(color: Colors.grey), textAlign: TextAlign.center),
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => context.read<DiscoveryBloc>().add(SyncContactEvent()),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry Sync'),
+                    )
+                  ],
                 ),
               ),
-            ],
-          ),
-        );
-      },
+            );
+          }
+
+          if (state is DiscoverySuccess) {
+            final contacts = state.matchedUsers;
+
+            if (contacts.isEmpty) {
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+                  const Icon(Icons.people_outline, size: 80, color: Colors.grey),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'No Matched Contacts Found',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 48.0),
+                    child: Text(
+                      'None of the contacts in your phone book are currently registered on this network.',
+                      style: TextStyle(color: Colors.grey, height: 1.4),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'My Contacts (${contacts.length})',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: contacts.length,
+                    separatorBuilder: (context, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final contact = contacts[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.blue.withOpacity(0.1),
+                          child: Text(
+                            contact.username.substring(0, 1).toUpperCase(),
+                            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                          ),
+                        ),
+                        title: Text(contact.username, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        subtitle: Text(contact.phoneNumber ?? '', style: const TextStyle(color: Colors.grey)),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.chat_bubble_outline, color: Colors.blue),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Starting chat room with @${contact.username}...')),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 }
