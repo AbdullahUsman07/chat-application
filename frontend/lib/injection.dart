@@ -6,6 +6,7 @@ import 'core/network/api_client.dart';
 import 'features/auth/data/datasources/auth_remote_datasource.dart';
 import 'features/auth/data/datasources/auth_local_datasource.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/contact_discovery/data/datasources/contact_local_data_source.dart';
 
 
 final sl = GetIt.instance;
@@ -30,4 +31,6 @@ void init(){
   );
 
   sl.registerFactory(() => ContactPermissionBloc());
+
+  sl.registerLazySingleton<ContactLocalDataStore>(() => ContactLocalDataStoreImpl());
 }
