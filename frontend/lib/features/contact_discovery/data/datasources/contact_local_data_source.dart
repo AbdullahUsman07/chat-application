@@ -4,11 +4,11 @@ import 'package:flutter_contacts/flutter_contacts.dart';
 import '../utils/phone_sanitizer.dart';
 
 
-abstract class ContactLocalDataStore{
+abstract class ContactLocalDataSource{
   Future <List<String>> getSanitizedPhoneNumbers({String defaultCountryCode ='+92'});
 }
 
-class ContactLocalDataStoreImpl implements ContactLocalDataStore{
+class ContactLocalDataSourceImpl implements ContactLocalDataSource{
   @override
   Future<List<String>> getSanitizedPhoneNumbers({String defaultCountryCode ='+92'}) async{
 

@@ -53,7 +53,7 @@ class DashboardPage extends StatelessWidget {
   // Uses a FutureBuilder to asynchronously fetch and output the sanitized device list
   Widget _buildDashboardContent() {
     return FutureBuilder<List<String>>(
-      future: sl<ContactLocalDataStore>().getSanitizedPhoneNumbers(),
+      future: sl<ContactLocalDataSource>().getSanitizedPhoneNumbers(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(

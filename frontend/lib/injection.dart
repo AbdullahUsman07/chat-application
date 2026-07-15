@@ -32,5 +32,5 @@ void init(){
 
   sl.registerFactory(() => ContactPermissionBloc());
 
-  sl.registerLazySingleton<ContactLocalDataStore>(() => ContactLocalDataStoreImpl());
+  sl.registerLazySingleton<ContactLocalDataSource>(() => ContactLocalDataSourceImpl());
 }
