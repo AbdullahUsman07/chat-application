@@ -35,11 +35,11 @@ class ContactsController{
     /**
      * Handles GET requests for global users
      */
-    async search(res,req){
+    async search(req, res){
         try{
 
-            const searchQuery = res.query.q;
-            const userId = res.user.id;
+            const searchQuery = req.query.q;
+            const userId = req.user.id;
 
             if (!searchQuery || searchQuery.trim().length < 2){
                 return res.status(400).json({
