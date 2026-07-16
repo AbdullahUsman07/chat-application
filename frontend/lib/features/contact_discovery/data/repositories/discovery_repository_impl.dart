@@ -24,4 +24,9 @@ class DiscoveryRepositoryImpl implements DiscoveryRepository{
 
     return await remoteDataSource.syncContacts(localNumbers);
   }
+
+  @override
+  Future<List<DiscoveredUserModel>> searchGlobalUsers(String query) async{
+    return remoteDataSource.searchGlobalUsers(query);
+  }
 }

@@ -6,6 +6,7 @@ import '../models/discovered_user_model.dart';
 
 abstract class DiscoveryRemoteDataSource{
   Future<List<DiscoveredUserModel>> syncContacts(List<String> phoneNumbers);
+  Future<List<DiscoveredUserModel>> searchGlobalUsers(String query);
 }
 
 class DiscoveryRemoteDataSourceImpl implements DiscoveryRemoteDataSource{
@@ -43,6 +44,27 @@ class DiscoveryRemoteDataSourceImpl implements DiscoveryRemoteDataSource{
       return dataList.map((json) => DiscoveredUserModel.fromJson(json)).toList();
     }else{
       throw Exception(response.data['message'] ?? 'Failed to Sync Contacts');
+    }
+  }
+
+  @override   
+  Future<List<DiscoveredUserModel>> searchGlobalUsers(String query) async{
+    final token = await authLocalDataSource.getToken();
+    if(token == null){
+      throw Exception('Unauthenticated: Access Token Missing');
+    }
+
+    final response = await apiClient.dio.get(
+      '/api/contacts/search',
+      queryParameters: {'q': query},
+      options: Options(headers: {'Authorization': 'Bearer $token'})
+    );
+
+    if(response.statusCode == 200 && response.data['success'] == true){
+      final List<dynamic> dataList = response.data['data'] as List<dynamic>;
+      return dataList.map((json) => DiscoveredUserModel.fromJson(json)).toList();
+    }else{
+      throw Exception(response.data['message']?? 'Global Search Failed!');
     }
   }
 }

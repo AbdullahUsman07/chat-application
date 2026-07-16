@@ -5,4 +5,5 @@ abstract class DiscoveryRepository {
 
   // pulls local contacts, filters them, sanitizes them, and matches them via backend
   Future<List<DiscoveredUserModel>> syncDeviceContacts();
+  Future<List<DiscoveredUserModel>> searchGlobalUsers(String query);
 }
