@@ -7,7 +7,8 @@ function initWebSocket(server){
         cors:{
             origin: "*", // Allows tunnel proxies like ngrok to pass connections without CORS block
             methods: ["GET", "POST"]
-        }
+        },
+        transports: ['websocket', 'polling']
     });
 
     io.on('connection', (socket) => {
