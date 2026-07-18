@@ -1,5 +1,6 @@
 
 const {Server} = require('socket.io');
+const jwt = require('jsonwebtoken');
 
 function initWebSocket(server){
     
@@ -9,6 +10,32 @@ function initWebSocket(server){
             methods: ["GET", "POST"]
         },
         transports: ['websocket', 'polling']
+    });
+
+    io.use((socket, next) => {
+        try{
+
+            const token = socket.handshake.auth?.token || socket.handshake.headers['authorization'];
+
+            if(!token){
+                console.error('[WebSocket Auth] Connection Rejected: Missing Token Payload.');
+                return next(new Error('Authentication failed: No token provided.'));
+            }
+
+            // clean the token if passed with standard Bearer prefix
+            const cleanToken = token.startsWith('Bearer ') ? token.slice(7) : token;
+
+            const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET) || "your_fallback_secret";
+
+            socket.user = decoded;
+
+            console.log(`[WebSocket Auth] Token verified for User ID: ${decoded.id || 'Unknown ID'}`);
+            next();
+
+        } catch(error){
+            console.error('[WebSocket Auth] Connection Rejected: Token verification failed. ', error.message);
+            return next(new Error('Authentication Failed: Invalid or expired Token'));
+        }
     });
 
     io.on('connection', (socket) => {
