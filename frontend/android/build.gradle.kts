@@ -15,6 +15,19 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
+// 1. Intercept the Android plugin BEFORE evaluation
+subprojects {
+    project.plugins.withId("com.android.library") {
+        project.extensions.configure<com.android.build.gradle.LibraryExtension> {
+            if (namespace == null) {
+                namespace = project.group.toString()
+            }
+        }
+    }
+}
+
+// 2. Force evaluation ONLY AFTER the namespace is dynamically injected
 subprojects {
     project.evaluationDependsOn(":app")
 }

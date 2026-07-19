@@ -12,11 +12,15 @@ import 'features/contact_discovery/domain/repositories/discovery_repository.dart
 import 'features/contact_discovery/data/repositories/discovery_repository_impl.dart';
 import 'features/contact_discovery/presentation/bloc/discovery_bloc.dart';
 import 'features/contact_discovery/presentation/bloc/search_bloc.dart';
-
+import 'core/database/local_cache_service.dart';
 
 final sl = GetIt.instance;
 
-void init(){
+void init() async{
+
+  final cacheService = LocalCacheService();
+  await cacheService.init();
+  sl.registerSingleton<LocalCacheService>(cacheService);
   
   sl.registerLazySingleton<ApiClient>(() => ApiClient());
   sl.registerLazySingleton<FlutterSecureStorage>(() => const FlutterSecureStorage());
