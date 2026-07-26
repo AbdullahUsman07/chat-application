@@ -1,6 +1,6 @@
 
 
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../features/chat_dashboard/data/models/user_collection.dart';
 import '../../features/chat_dashboard/data/models/message_collection.dart';

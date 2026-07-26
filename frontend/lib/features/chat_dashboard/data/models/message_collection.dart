@@ -1,5 +1,5 @@
 import 'package:frontend/features/chat_dashboard/domain/entities/message_status.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'message_collection.g.dart';
 

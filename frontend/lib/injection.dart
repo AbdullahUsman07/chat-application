@@ -16,7 +16,7 @@ import 'core/database/local_cache_service.dart';
 
 final sl = GetIt.instance;
 
-void init() async{
+Future<void> init() async{
 
   final cacheService = LocalCacheService();
   await cacheService.init();

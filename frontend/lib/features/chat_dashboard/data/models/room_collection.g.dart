@@ -17,11 +17,7 @@ const RoomCollectionSchema = CollectionSchema(
   name: r'RoomCollection',
   id: 1548848606307669749,
   properties: {
-    r'isGroup': PropertySchema(
-      id: 0,
-      name: r'isGroup',
-      type: IsarType.bool,
-    ),
+    r'isGroup': PropertySchema(id: 0, name: r'isGroup', type: IsarType.bool),
     r'lastMessagePayload': PropertySchema(
       id: 1,
       name: r'lastMessagePayload',
@@ -46,8 +42,9 @@ const RoomCollectionSchema = CollectionSchema(
       id: 5,
       name: r'unreadCount',
       type: IsarType.long,
-    )
+    ),
   },
+
   estimateSize: _roomCollectionEstimateSize,
   serialize: _roomCollectionSerialize,
   deserialize: _roomCollectionDeserialize,
@@ -64,16 +61,17 @@ const RoomCollectionSchema = CollectionSchema(
           name: r'postgresId',
           type: IndexType.value,
           caseSensitive: false,
-        )
+        ),
       ],
-    )
+    ),
   },
   links: {},
   embeddedSchemas: {},
+
   getId: _roomCollectionGetId,
   getLinks: _roomCollectionGetLinks,
   attach: _roomCollectionAttach,
-  version: '3.1.0+1',
+  version: '3.3.2',
 );
 
 int _roomCollectionEstimateSize(
@@ -157,7 +155,10 @@ List<IsarLinkBase<dynamic>> _roomCollectionGetLinks(RoomCollection object) {
 }
 
 void _roomCollectionAttach(
-    IsarCollection<dynamic> col, Id id, RoomCollection object) {
+  IsarCollection<dynamic> col,
+  Id id,
+  RoomCollection object,
+) {
   object.id = id;
 }
 
@@ -210,8 +211,10 @@ extension RoomCollectionByIndex on IsarCollection<RoomCollection> {
     return putAllByIndex(r'postgresId', objects);
   }
 
-  List<Id> putAllByPostgresIdSync(List<RoomCollection> objects,
-      {bool saveLinks = true}) {
+  List<Id> putAllByPostgresIdSync(
+    List<RoomCollection> objects, {
+    bool saveLinks = true,
+  }) {
     return putAllByIndexSync(r'postgresId', objects, saveLinks: saveLinks);
   }
 }
@@ -236,17 +239,16 @@ extension RoomCollectionQueryWhereSort
 extension RoomCollectionQueryWhere
     on QueryBuilder<RoomCollection, RoomCollection, QWhereClause> {
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause> idEqualTo(
-      Id id) {
+    Id id,
+  ) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: id,
-        upper: id,
-      ));
+      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause> idNotEqualTo(
-      Id id) {
+    Id id,
+  ) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -269,8 +271,9 @@ extension RoomCollectionQueryWhere
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause> idGreaterThan(
-      Id id,
-      {bool include = false}) {
+    Id id, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -279,8 +282,9 @@ extension RoomCollectionQueryWhere
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause> idLessThan(
-      Id id,
-      {bool include = false}) {
+    Id id, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -295,105 +299,114 @@ extension RoomCollectionQueryWhere
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: lowerId,
-        includeLower: includeLower,
-        upper: upperId,
-        includeUpper: includeUpper,
-      ));
+      return query.addWhereClause(
+        IdWhereClause.between(
+          lower: lowerId,
+          includeLower: includeLower,
+          upper: upperId,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause>
-      postgresIdEqualTo(int postgresId) {
+  postgresIdEqualTo(int postgresId) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.equalTo(
-        indexName: r'postgresId',
-        value: [postgresId],
-      ));
+      return query.addWhereClause(
+        IndexWhereClause.equalTo(indexName: r'postgresId', value: [postgresId]),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause>
-      postgresIdNotEqualTo(int postgresId) {
+  postgresIdNotEqualTo(int postgresId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'postgresId',
-              lower: [],
-              upper: [postgresId],
-              includeUpper: false,
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'postgresId',
-              lower: [postgresId],
-              includeLower: false,
-              upper: [],
-            ));
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'postgresId',
+                lower: [],
+                upper: [postgresId],
+                includeUpper: false,
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'postgresId',
+                lower: [postgresId],
+                includeLower: false,
+                upper: [],
+              ),
+            );
       } else {
         return query
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'postgresId',
-              lower: [postgresId],
-              includeLower: false,
-              upper: [],
-            ))
-            .addWhereClause(IndexWhereClause.between(
-              indexName: r'postgresId',
-              lower: [],
-              upper: [postgresId],
-              includeUpper: false,
-            ));
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'postgresId',
+                lower: [postgresId],
+                includeLower: false,
+                upper: [],
+              ),
+            )
+            .addWhereClause(
+              IndexWhereClause.between(
+                indexName: r'postgresId',
+                lower: [],
+                upper: [postgresId],
+                includeUpper: false,
+              ),
+            );
       }
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause>
-      postgresIdGreaterThan(
-    int postgresId, {
-    bool include = false,
-  }) {
+  postgresIdGreaterThan(int postgresId, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'postgresId',
-        lower: [postgresId],
-        includeLower: include,
-        upper: [],
-      ));
+      return query.addWhereClause(
+        IndexWhereClause.between(
+          indexName: r'postgresId',
+          lower: [postgresId],
+          includeLower: include,
+          upper: [],
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause>
-      postgresIdLessThan(
-    int postgresId, {
-    bool include = false,
-  }) {
+  postgresIdLessThan(int postgresId, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'postgresId',
-        lower: [],
-        upper: [postgresId],
-        includeUpper: include,
-      ));
+      return query.addWhereClause(
+        IndexWhereClause.between(
+          indexName: r'postgresId',
+          lower: [],
+          upper: [postgresId],
+          includeUpper: include,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterWhereClause>
-      postgresIdBetween(
+  postgresIdBetween(
     int lowerPostgresId,
     int upperPostgresId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IndexWhereClause.between(
-        indexName: r'postgresId',
-        lower: [lowerPostgresId],
-        includeLower: includeLower,
-        upper: [upperPostgresId],
-        includeUpper: includeUpper,
-      ));
+      return query.addWhereClause(
+        IndexWhereClause.between(
+          indexName: r'postgresId',
+          lower: [lowerPostgresId],
+          includeLower: includeLower,
+          upper: [upperPostgresId],
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 }
@@ -401,40 +414,38 @@ extension RoomCollectionQueryWhere
 extension RoomCollectionQueryFilter
     on QueryBuilder<RoomCollection, RoomCollection, QFilterCondition> {
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition> idEqualTo(
-      Id value) {
+    Id value,
+  ) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'id', value: value),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      idGreaterThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idGreaterThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      idLessThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idLessThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
@@ -445,92 +456,96 @@ extension RoomCollectionQueryFilter
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'id',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'id',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      isGroupEqualTo(bool value) {
+  isGroupEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'isGroup',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'isGroup', value: value),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadIsNull() {
+  lastMessagePayloadIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'lastMessagePayload',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'lastMessagePayload'),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadIsNotNull() {
+  lastMessagePayloadIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'lastMessagePayload',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'lastMessagePayload'),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
+  lastMessagePayloadEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadLessThan(
+  lastMessagePayloadGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadBetween(
+  lastMessagePayloadLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
+  lastMessagePayloadBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -538,265 +553,268 @@ extension RoomCollectionQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'lastMessagePayload',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'lastMessagePayload',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  lastMessagePayloadStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  lastMessagePayloadEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadContains(String value, {bool caseSensitive = true}) {
+  lastMessagePayloadContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'lastMessagePayload',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'lastMessagePayload',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadMatches(String pattern, {bool caseSensitive = true}) {
+  lastMessagePayloadMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'lastMessagePayload',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'lastMessagePayload',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadIsEmpty() {
+  lastMessagePayloadIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastMessagePayload',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'lastMessagePayload', value: ''),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessagePayloadIsNotEmpty() {
+  lastMessagePayloadIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'lastMessagePayload',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'lastMessagePayload', value: ''),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeIsNull() {
+  lastMessageTimeIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'lastMessageTime',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'lastMessageTime'),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeIsNotNull() {
+  lastMessageTimeIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'lastMessageTime',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'lastMessageTime'),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeEqualTo(DateTime? value) {
+  lastMessageTimeEqualTo(DateTime? value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'lastMessageTime',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'lastMessageTime', value: value),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeGreaterThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
+  lastMessageTimeGreaterThan(DateTime? value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'lastMessageTime',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'lastMessageTime',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeLessThan(
-    DateTime? value, {
-    bool include = false,
-  }) {
+  lastMessageTimeLessThan(DateTime? value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'lastMessageTime',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'lastMessageTime',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      lastMessageTimeBetween(
+  lastMessageTimeBetween(
     DateTime? lower,
     DateTime? upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'lastMessageTime',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'lastMessageTime',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      postgresIdEqualTo(int value) {
+  postgresIdEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'postgresId',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'postgresId', value: value),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      postgresIdGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
+  postgresIdGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'postgresId',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'postgresId',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      postgresIdLessThan(
-    int value, {
-    bool include = false,
-  }) {
+  postgresIdLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'postgresId',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'postgresId',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      postgresIdBetween(
+  postgresIdBetween(
     int lower,
     int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'postgresId',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'postgresId',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameEqualTo(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  roomNameEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameGreaterThan(
-    String value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameLessThan(
+  roomNameGreaterThan(
     String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameBetween(
+  roomNameLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
+  roomNameBetween(
     String lower,
     String upper, {
     bool includeLower = true,
@@ -804,140 +822,141 @@ extension RoomCollectionQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'roomName',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'roomName',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  roomNameStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  roomNameEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameContains(String value, {bool caseSensitive = true}) {
+  roomNameContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'roomName',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'roomName',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameMatches(String pattern, {bool caseSensitive = true}) {
+  roomNameMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'roomName',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'roomName',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameIsEmpty() {
+  roomNameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'roomName',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'roomName', value: ''),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      roomNameIsNotEmpty() {
+  roomNameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'roomName',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'roomName', value: ''),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      unreadCountEqualTo(int value) {
+  unreadCountEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'unreadCount',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'unreadCount', value: value),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      unreadCountGreaterThan(
-    int value, {
-    bool include = false,
-  }) {
+  unreadCountGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'unreadCount',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'unreadCount',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      unreadCountLessThan(
-    int value, {
-    bool include = false,
-  }) {
+  unreadCountLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'unreadCount',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'unreadCount',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterFilterCondition>
-      unreadCountBetween(
+  unreadCountBetween(
     int lower,
     int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'unreadCount',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'unreadCount',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 }
@@ -957,49 +976,49 @@ extension RoomCollectionQuerySortBy
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByIsGroupDesc() {
+  sortByIsGroupDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGroup', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByLastMessagePayload() {
+  sortByLastMessagePayload() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessagePayload', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByLastMessagePayloadDesc() {
+  sortByLastMessagePayloadDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessagePayload', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByLastMessageTime() {
+  sortByLastMessageTime() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessageTime', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByLastMessageTimeDesc() {
+  sortByLastMessageTimeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessageTime', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByPostgresId() {
+  sortByPostgresId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'postgresId', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByPostgresIdDesc() {
+  sortByPostgresIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'postgresId', Sort.desc);
     });
@@ -1012,21 +1031,21 @@ extension RoomCollectionQuerySortBy
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByRoomNameDesc() {
+  sortByRoomNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'roomName', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByUnreadCount() {
+  sortByUnreadCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unreadCount', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      sortByUnreadCountDesc() {
+  sortByUnreadCountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unreadCount', Sort.desc);
     });
@@ -1054,49 +1073,49 @@ extension RoomCollectionQuerySortThenBy
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByIsGroupDesc() {
+  thenByIsGroupDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGroup', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByLastMessagePayload() {
+  thenByLastMessagePayload() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessagePayload', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByLastMessagePayloadDesc() {
+  thenByLastMessagePayloadDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessagePayload', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByLastMessageTime() {
+  thenByLastMessageTime() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessageTime', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByLastMessageTimeDesc() {
+  thenByLastMessageTimeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastMessageTime', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByPostgresId() {
+  thenByPostgresId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'postgresId', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByPostgresIdDesc() {
+  thenByPostgresIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'postgresId', Sort.desc);
     });
@@ -1109,21 +1128,21 @@ extension RoomCollectionQuerySortThenBy
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByRoomNameDesc() {
+  thenByRoomNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'roomName', Sort.desc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByUnreadCount() {
+  thenByUnreadCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unreadCount', Sort.asc);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QAfterSortBy>
-      thenByUnreadCountDesc() {
+  thenByUnreadCountDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'unreadCount', Sort.desc);
     });
@@ -1139,36 +1158,39 @@ extension RoomCollectionQueryWhereDistinct
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QDistinct>
-      distinctByLastMessagePayload({bool caseSensitive = true}) {
+  distinctByLastMessagePayload({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'lastMessagePayload',
-          caseSensitive: caseSensitive);
+      return query.addDistinctBy(
+        r'lastMessagePayload',
+        caseSensitive: caseSensitive,
+      );
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QDistinct>
-      distinctByLastMessageTime() {
+  distinctByLastMessageTime() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'lastMessageTime');
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QDistinct>
-      distinctByPostgresId() {
+  distinctByPostgresId() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'postgresId');
     });
   }
 
-  QueryBuilder<RoomCollection, RoomCollection, QDistinct> distinctByRoomName(
-      {bool caseSensitive = true}) {
+  QueryBuilder<RoomCollection, RoomCollection, QDistinct> distinctByRoomName({
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'roomName', caseSensitive: caseSensitive);
     });
   }
 
   QueryBuilder<RoomCollection, RoomCollection, QDistinct>
-      distinctByUnreadCount() {
+  distinctByUnreadCount() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'unreadCount');
     });
@@ -1190,14 +1212,14 @@ extension RoomCollectionQueryProperty
   }
 
   QueryBuilder<RoomCollection, String?, QQueryOperations>
-      lastMessagePayloadProperty() {
+  lastMessagePayloadProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastMessagePayload');
     });
   }
 
   QueryBuilder<RoomCollection, DateTime?, QQueryOperations>
-      lastMessageTimeProperty() {
+  lastMessageTimeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastMessageTime');
     });

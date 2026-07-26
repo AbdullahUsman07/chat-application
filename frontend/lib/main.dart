@@ -9,11 +9,11 @@ import 'features/auth/presentation/bloc/auth_state.dart';
 import 'features/auth/data/datasources/auth_local_datasource.dart';
 
 
-void main()async{
+void main() async{
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  di.init();
+  await di.init();
 
   final localDataStore = di.sl<AuthLocalDataSource>();
   final String? token = await localDataStore.getToken();
