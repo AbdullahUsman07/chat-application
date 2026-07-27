@@ -2,6 +2,7 @@
 const {Server} = require('socket.io');
 const jwt = require('jsonwebtoken');
 const presenceManager = require('./presence.manager');
+const chatService = require('../components/chat/chat.service');
 
 function initWebSocket(server){
     
@@ -46,6 +47,39 @@ function initWebSocket(server){
         if(userId){
             await presenceManager.addSocket(userId, socket.id);
         }
+
+        socket.on('send_message', async (data, callback) => {
+            try{
+                const {roomId, payload, clientUuid } = data;
+                console.log(`[WebSocket] Incoming message from User ${userId} for Room ${roomId}: "${payload}"`);
+
+                // Write to postgreSQL and query Redis Recipient Sockets
+                const {message, recipientSockets} = await chatService.processOutboundMessage({
+                    roomId,
+                    senderId: userId,
+                    payload
+                });
+
+                // fan-out real-time broadcast to online recipient sockets
+                recipientSockets.forEach(targetSocketId => {
+                    io.to(targetSocketId).emit('receive_message', message);
+                })
+
+                // acknwoledge back to sender
+                if (typeof callback == 'function'){
+                    callback({
+                        status: 'ok',
+                        clientUuid,
+                        message
+                    });
+                }
+            }catch(error){
+                console.error('[WebSocket Error] Message handling failed: ', error);
+                if (typeof callback == 'function'){
+                    callback({status: 'error', message: error.message});
+                }
+            }
+        });
 
         // standard echo placeholder for connection verification testing
         socket.on('ping_test', (data) =>{
