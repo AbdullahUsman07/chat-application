@@ -1,6 +1,7 @@
 
 const {Server} = require('socket.io');
 const jwt = require('jsonwebtoken');
+const presenceManager = require('./presence.manager');
 
 function initWebSocket(server){
     
@@ -38,8 +39,13 @@ function initWebSocket(server){
         }
     });
 
-    io.on('connection', (socket) => {
-        console.log(`[WebSocket] New client connected. Socket ID: ${socket.id}`);
+    io.on('connection', async (socket) => {
+        const userId = socket.user?.id || socket.user?.userId;
+        console.log(`[WebSocket] New client connected. Socket ID: ${socket.id}  (UserId : ${userId})`);
+
+        if(userId){
+            await presenceManager.addSocket(userId, socket.id);
+        }
 
         // standard echo placeholder for connection verification testing
         socket.on('ping_test', (data) =>{
@@ -47,8 +53,11 @@ function initWebSocket(server){
             socket.emit('pong_test', {message: "Server Handshake Acknowledged!", timestamp: new Date()});
         });
 
-        socket.on('disconnect', () =>{
-            console.log(`[WebSocket] Client Disconnected. Socket ID: ${socket.id}`);
+        socket.on('disconnect', async () =>{
+            console.log(`[WebSocket] Client Disconnected. Socket ID: ${socket.id} (User ID: ${userId})`);
+            if(userId){
+                await presenceManager.removeSocket(userId,socket.id);
+            }
         });
     });
 
