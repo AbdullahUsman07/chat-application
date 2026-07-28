@@ -65,8 +65,32 @@ async function getOrCreateDirectRoom(userAId, userBId){
     return roomId;
 }
 
+
+/**
+ * Marks all unread messages in a room for a specific user as 'read'
+ */
+async function markRoomAsRead(roomId, recipientUserId){
+    const results = await db.query(chatQueries.markRoomMessagesAsRead, [roomId, recipientUserId]);
+    return results.rows;
+}
+
+/**
+ * Mark an array of messsage IDs as 'delivered' in batch
+ */
+async function markMessagesDeliveredBatch(messageIds){
+    if (!messageIds || messageIds.length == 0) return [];
+
+    // ensure array format even if a singleID string/number is passed
+    const idArray = Array.isArray(messageIds)? messageIds : [messageIds];
+
+    const result = await db.query(chatQueries.markMessagesDeliveredBatch, [messageIds]);
+    return result.rows; 
+}
+
 module.exports ={
     processOutboundMessage,
-    getOrCreateDirectRoom
+    getOrCreateDirectRoom,
+    markRoomAsRead,
+    markMessagesDeliveredBatch
 };
 

@@ -32,4 +32,25 @@ module.exports = {
         VALUES ($1, $2, $3, 'sent')
         RETURNING id, room_id, sender_id, payload, status, created_at;
     `,
+
+    getMessageByClientUuid: `
+        SELECT id, room_id, sender_id, payload, status, created_at
+        FROM messages
+        WHERE client_uuid = $1;
+    `,
+
+    // Bulk update unread messages in a room to 'read'
+    markRoomMessagesAsRead: `
+        UPDATE messages
+        SET status = 'read'
+        WHERE room_id = $1 AND sender_id != $2 AND status != 'read'
+        RETURNING id, room_id, sender_id, status;
+    `,
+
+    markMessagesDeliveredBatch: `
+        UPDATE messages
+        SET status = 'delivered'
+        WHERE id = ANY($1::bigint[]) AND status = 'sent'
+        RETURNING id, room_id, sender_id, status;
+    `,
 }

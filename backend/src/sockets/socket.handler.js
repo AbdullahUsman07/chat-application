@@ -81,6 +81,64 @@ function initWebSocket(server){
             }
         });
 
+        // recipient notifies server that message was received on device
+        socket.on('message_delivered', async (data) =>{
+            try{
+                const {messageId, messageIds, senderId} = data;
+
+                // normalize input into an array 
+                const idsToUpdate = messageIds || (messageId ? [messageId]: []);
+                if(idsToUpdate.length == 0) return;
+
+                const updatedMessages = await chatService.markMessagesDeliveredBatch(idsToUpdate);
+
+                if(idsToUpdate.length > 0){
+                    
+                    // retrieve active sockets for the original SENDER from Redis
+                    const senderSockets = await presenceManager.getUserSockets(senderId);
+
+                    // broadcast status update back to sender's active devices
+                    senderSockets.forEach(targetSocketId => {
+                        io.to(targetSocketId).emit('message_status_updated', {
+                            messageIds: updatedMessages.map(m => m.id),
+                            roomId: updatedMessages[0].room_id,
+                            status: 'delivered'
+                        });
+                    });
+                }
+            }catch(error){
+                console.error('[WebSocket Error] Delivery receipt failed: ',error.message); 
+            }
+        });
+
+        // recipient open chat room and views messages
+        socket.on('message_read', async (data) =>{
+            try{
+                const {roomId, senderId} = data;
+                const userId = socket.user.id;
+
+                // bulk update unread messages in DB to 'read'
+                const updatedMessages = await chatService.markRoomAsRead(roomId, userId);
+
+                if(updatedMessages.length > 0){
+                    // find active sockets for the original SENDER from redis
+                    const senderSockets = await presenceManager.getUserSockets(senderId);
+                    console.log(`[Sender Websocket]: ${senderSockets}`);
+
+                    // notify sender that messages were read
+                    senderSockets.forEach(targetSocketId => {
+                        io.to(targetSocketId).emit('message_status_updated', {
+                            roomId,
+                            status: 'read',
+                            updatedCount: updatedMessages.length
+                        });
+                    })
+                }
+            }catch(error){
+                console.error('[WebSocket Error] Read receipt failed: ', error.message);
+            }
+        });
+
         // standard echo placeholder for connection verification testing
         socket.on('ping_test', (data) =>{
             console.log(`[WebSocket] Recieved ping_test: `, data);
