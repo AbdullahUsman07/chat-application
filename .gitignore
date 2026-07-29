@@ -7,3 +7,6 @@ backend/tests/
 
 frontend/lib/config/enviornment.dart
 frontend/android/build/
+
+
+backend/config/serviceAccountKey.json
