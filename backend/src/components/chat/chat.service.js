@@ -2,6 +2,7 @@
 const db = require('../../../config/db');
 const chatQueries = require('../../db/queries/chat.queries');
 const presenceManager = require('../../sockets/presence.manager');
+const fcmService = require('./fcm-service');
 
 /**
  * Persists an incoming message packet into PostgreSQL and resolves target recipient socket IDs.
@@ -12,8 +13,8 @@ const presenceManager = require('../../sockets/presence.manager');
  * @returns {Promise<{ message: Object, recipientSockets: string[], recipientIds: number[] }>}
  */
 
-async function processOutboundMessage({roomId, senderId, payload}){
-    if(!roomId || !senderId ||!payload){
+async function processOutboundMessage({ roomId, senderId, payload }) {
+    if (!roomId || !senderId || !payload) {
         throw new Error('Missing required message arguments: roomId, senderId, or payload.');
     }
 
@@ -22,35 +23,60 @@ async function processOutboundMessage({roomId, senderId, payload}){
     const savedMessage = result.rows[0];
 
     // 2. Fetch room members to identify participants
-    const memeberResults = await db.query(chatQueries.getRoomMembers,[roomId]);
+    const memeberResults = await db.query(chatQueries.getRoomMembers, [roomId]);
     // adding to diagnose broadcast error
-    console.log('[DEBUG] Room Members from DB: ',memeberResults.rows);
+    console.log('[DEBUG] Room Members from DB: ', memeberResults.rows);
 
     const recipentIds = memeberResults.rows
         .map(row => row.user_id)
-        .filter(userId => userId !== parseInt (senderId, 10));
-    console.log('[DEBUG] Filtered Recipient IDs: ',recipentIds);
+        .filter(userId => userId !== parseInt(senderId, 10));
+    console.log('[DEBUG] Filtered Recipient IDs: ', recipentIds);
 
-    // 3. Query Redis for recipent socket sets across all active devices
+    // 3. Query Redis for recipent socket sets & categorize online vs offline users
     const recipientSockets = [];
-    for(const recipentId of recipentIds){
+    const offlineRecipientIds = [];
+
+    for (const recipentId of recipentIds) {
         const sockets = await presenceManager.getUserSockets(recipentId);
-        recipientSockets.push(...sockets); 
+        if (sockets && sockets.length > 0) {
+            // recipient has active socket connection(s).
+            recipientSockets.push(...sockets);
+        }
+        else {
+            // recipient has 0 socket connection (meaning offline/backgrounded).
+            offlineRecipientIds.push(recipentId);
+
+            // trigger FCM push for offline users
+            try{
+                await fcmService.sendPushNotification({
+                    recipentId,
+                    senderId,
+                    roomId,
+                    postgresId: savedMessage.id,
+                    contentSnipped: payload
+                });
+                console.log(`[ROUTER] Dispatched FCM push to offline recipiet: ${recipentId}`);
+            }catch(pushErr){
+                console.error(`[ROUTER] FCM push trigger failed for recpient ${recipentId}: `, pushErr.message);
+            }
+        }
     }
-    console.log('[DEBUG] Resolved Sockets from Redis: ',recipientSockets);
+    console.log('[DEBUG] Resolved Sockets from Redis: ', recipientSockets);
+    console.log('[DEBUG] Offline recipients routes to FCM: ',offlineRecipientIds);
     return {
         message: savedMessage,
         recipientSockets,
-        recipentIds
+        recipentIds,
+        offlineRecipientIds
     };
 }
 
 /**
  * Function to retrieve an existing direct room ID between two users or create one on the fly.
  */
-async function getOrCreateDirectRoom(userAId, userBId){
+async function getOrCreateDirectRoom(userAId, userBId) {
     const existing = await db.query(chatQueries.getDirectRoomBetweenUsers, [userAId, userBId]);
-    if(existing.rows.length > 0){
+    if (existing.rows.length > 0) {
         return existing.rows[0].room_id || exisitng.rows[0].id;
     }
 
@@ -69,7 +95,7 @@ async function getOrCreateDirectRoom(userAId, userBId){
 /**
  * Marks all unread messages in a room for a specific user as 'read'
  */
-async function markRoomAsRead(roomId, recipientUserId){
+async function markRoomAsRead(roomId, recipientUserId) {
     const results = await db.query(chatQueries.markRoomMessagesAsRead, [roomId, recipientUserId]);
     return results.rows;
 }
@@ -77,17 +103,19 @@ async function markRoomAsRead(roomId, recipientUserId){
 /**
  * Mark an array of messsage IDs as 'delivered' in batch
  */
-async function markMessagesDeliveredBatch(messageIds){
+async function markMessagesDeliveredBatch(messageIds) {
     if (!messageIds || messageIds.length == 0) return [];
 
     // ensure array format even if a singleID string/number is passed
-    const idArray = Array.isArray(messageIds)? messageIds : [messageIds];
+    const idArray = Array.isArray(messageIds) ? messageIds : [messageIds];
 
     const result = await db.query(chatQueries.markMessagesDeliveredBatch, [messageIds]);
-    return result.rows; 
+    return result.rows;
 }
 
-module.exports ={
+
+
+module.exports = {
     processOutboundMessage,
     getOrCreateDirectRoom,
     markRoomAsRead,
