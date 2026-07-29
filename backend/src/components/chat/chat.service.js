@@ -2,7 +2,7 @@
 const db = require('../../../config/db');
 const chatQueries = require('../../db/queries/chat.queries');
 const presenceManager = require('../../sockets/presence.manager');
-const fcmService = require('./fcm-service');
+const fcmService = require('./fcm.service');
 
 /**
  * Persists an incoming message packet into PostgreSQL and resolves target recipient socket IDs.
@@ -53,7 +53,7 @@ async function processOutboundMessage({ roomId, senderId, payload }) {
                     senderId,
                     roomId,
                     postgresId: savedMessage.id,
-                    contentSnipped: payload
+                    contentSnippet: payload
                 });
                 console.log(`[ROUTER] Dispatched FCM push to offline recipiet: ${recipentId}`);
             }catch(pushErr){
